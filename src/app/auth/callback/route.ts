@@ -18,14 +18,14 @@ export async function GET(request: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get: (cookieName) => request.headers.get("cookie") ?? "",
-        set: (cookieName, value) => {
+        get: (cookieName: string) => request.headers.get("cookie") ?? "",
+        set: (cookieName: string, value: string) => {
           response.headers.append(
             "Set-Cookie",
             `${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax`
           );
         },
-        remove: (cookieName) => {
+        remove: (cookieName: string) => {
           response.headers.append(
             "Set-Cookie",
             `${cookieName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
