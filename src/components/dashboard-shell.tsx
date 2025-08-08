@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, FileText, DollarSign, Folder, Settings } from "lucide-react";
-import SignOutButton from "@/components/signout-button"; // ✅ fixed import path
+import SignOutButton from "@/components/signout-button"; // fixed path
 
 interface DashboardShellProps {
   children: React.ReactNode;
