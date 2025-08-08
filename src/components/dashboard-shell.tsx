@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, DollarSign, Folder, Settings, LogOut } from "lucide-react";
+import { Home, FileText, DollarSign, Folder, Settings } from "lucide-react";
 import SignOutButton from "./signout-button";
 
-export default function DashboardShell({ children }: { children: React.ReactNode }) {
+interface DashboardShellProps {
+  children: React.ReactNode;
+}
+
+export default function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
 
   const navItems = [
@@ -19,7 +23,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   return (
     <div className="flex min-h-screen bg-neutral-900 text-white">
-      {/* Sidebar */}
       <aside className="w-64 bg-neutral-800 p-4 space-y-6">
         <h1 className="text-xl font-bold">Higuel Dashboard</h1>
         <nav className="space-y-2">
@@ -38,10 +41,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         </nav>
         <SignOutButton />
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
-

@@ -1,6 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
+export const runtime = "nodejs";
+
+interface Property {
+  id: string;
+  name: string;
+  status: string | null;
+  created_at: string;
+}
+
 export default async function PropertiesPage() {
   const supabase = createClient();
   const {
@@ -23,7 +32,6 @@ export default async function PropertiesPage() {
 
   return (
     <div>
-      {/* New Property Button */}
       <div className="flex justify-end mb-4">
         <Link
           href="/properties/new"
@@ -33,7 +41,6 @@ export default async function PropertiesPage() {
         </Link>
       </div>
 
-      {/* Properties List */}
       {properties && properties.length > 0 ? (
         <table className="w-full bg-neutral-800 rounded-lg overflow-hidden">
           <thead>
@@ -44,10 +51,10 @@ export default async function PropertiesPage() {
             </tr>
           </thead>
           <tbody>
-            {properties.map((property) => (
+            {properties.map((property: Property) => (
               <tr key={property.id} className="border-b border-neutral-700">
                 <td className="p-3">{property.name}</td>
-                <td className="p-3">{property.status}</td>
+                <td className="p-3">{property.status ?? "—"}</td>
                 <td className="p-3">
                   {new Date(property.created_at).toLocaleDateString()}
                 </td>
@@ -61,4 +68,3 @@ export default async function PropertiesPage() {
     </div>
   );
 }
-
