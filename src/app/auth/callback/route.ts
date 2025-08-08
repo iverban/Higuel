@@ -18,17 +18,17 @@ export async function GET(request: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get: (cookieName: string) => request.headers.get("cookie") ?? "",
-        set: (cookieName: string, value: string) => {
+        get: () => request.headers.get("cookie") ?? "",
+        set: (value: string) => {
           response.headers.append(
             "Set-Cookie",
-            `${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax`
+            `auth=${value}; Path=/; HttpOnly; Secure; SameSite=Lax`
           );
         },
-        remove: (cookieName: string) => {
+        remove: () => {
           response.headers.append(
             "Set-Cookie",
-            `${cookieName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+            "auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
           );
         },
       },
