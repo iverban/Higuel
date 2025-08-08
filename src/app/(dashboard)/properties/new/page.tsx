@@ -8,16 +8,16 @@ export default function NewPropertyPage() {
   const supabase = createClient();
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [listingPrice, setListingPrice] = useState("");
-  const [acquisitionPrice, setAcquisitionPrice] = useState("");
-  const [currencyCode, setCurrencyCode] = useState("USD");
-  const [status, setStatus] = useState("");
-  const [plotNumber, setPlotNumber] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [listingPrice, setListingPrice] = useState<string>("");
+  const [acquisitionPrice, setAcquisitionPrice] = useState<string>("");
+  const [currencyCode, setCurrencyCode] = useState<string>("USD");
+  const [status, setStatus] = useState<string>("");
+  const [plotNumber, setPlotNumber] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,7 +55,8 @@ export default function NewPropertyPage() {
         const { error: uploadError } = await supabase.storage
           .from("property-pictures")
           .upload(fileName, imageFile);
-        if (uploadError) throw uploadError;
+        if (uploadError) throw new Error(uploadError.message);
+
         const { data: publicUrlData } = supabase.storage
           .from("property-pictures")
           .getPublicUrl(fileName);
@@ -65,7 +66,7 @@ export default function NewPropertyPage() {
       const { error: insertError } = await supabase.from("properties").insert([
         {
           owner_user_id: user.id,
-          name: title, // matches DB column
+          name: title,
           description,
           listing_price: listingPrice ? parseFloat(listingPrice) : null,
           acquisition_price: acquisitionPrice ? parseFloat(acquisitionPrice) : null,
@@ -75,11 +76,15 @@ export default function NewPropertyPage() {
           image_url: imageUrl,
         },
       ]);
-      if (insertError) throw insertError;
+      if (insertError) throw new Error(insertError.message);
 
       router.push("/properties");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
