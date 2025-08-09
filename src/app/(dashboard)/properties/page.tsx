@@ -5,18 +5,21 @@ export const runtime = "nodejs";
 
 interface Property {
   id: string;
-  name: string;
+  title: string;
   status: string | null;
   created_at: string;
 }
 
 export default async function PropertiesPage() {
-  const supabase = await createClient(); // ✅ added await
+  const supabase = await createClient();
 
   const {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
+
+  // 🔹 TEMPORARY: Debug log to check cookie/session in production
+  console.log("🔍 [PropertiesPage] User from Supabase:", user);
 
   if (userError) {
     return <p className="text-red-500">Error fetching user: {userError.message}</p>;
@@ -28,7 +31,7 @@ export default async function PropertiesPage() {
 
   const { data: properties, error } = await supabase
     .from("properties")
-    .select("id, name, status, created_at")
+    .select("id, title, status, created_at")
     .eq("owner_user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -38,6 +41,7 @@ export default async function PropertiesPage() {
 
   return (
     <div>
+      {/* Add Property Button */}
       <div className="flex justify-end mb-4">
         <Link
           href="/properties/new"
@@ -47,11 +51,12 @@ export default async function PropertiesPage() {
         </Link>
       </div>
 
+      {/* Properties Table */}
       {properties && properties.length > 0 ? (
         <table className="w-full bg-neutral-800 rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-neutral-700 text-left">
-              <th className="p-3">Name</th>
+              <th className="p-3">Title</th>
               <th className="p-3">Status</th>
               <th className="p-3">Created</th>
             </tr>
@@ -59,7 +64,7 @@ export default async function PropertiesPage() {
           <tbody>
             {properties.map((property: Property) => (
               <tr key={property.id} className="border-b border-neutral-700">
-                <td className="p-3">{property.name}</td>
+                <td className="p-3">{property.title}</td>
                 <td className="p-3">{property.status ?? "—"}</td>
                 <td className="p-3">
                   {new Date(property.created_at).toLocaleDateString()}

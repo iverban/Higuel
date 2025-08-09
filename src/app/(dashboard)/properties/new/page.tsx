@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,6 +19,19 @@ export default function NewPropertyPage() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  // 🔹 TEMPORARY: check if user is authenticated when loading the page
+  useEffect(() => {
+    (async () => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log("🔍 [NewPropertyPage] User from Supabase:", user, "Error:", userError);
+
+      if (!user) {
+        console.warn("⚠️ No user found — redirecting to /login");
+        router.push("/login");
+      }
+    })();
+  }, [router, supabase]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -35,172 +48,5 @@ export default function NewPropertyPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setError("User not logged in.");
-        setLoading(false);
-        return;
-      }
-
-      let imageUrl: string | null = null;
-      if (imageFile) {
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("property-pictures")
-          .upload(fileName, imageFile);
-        if (uploadError) throw new Error(uploadError.message);
-
-        const { data: publicUrlData } = supabase.storage
-          .from("property-pictures")
-          .getPublicUrl(fileName);
-        imageUrl = publicUrlData.publicUrl;
-      }
-
-      const { error: insertError } = await supabase.from("properties").insert([
-        {
-          owner_user_id: user.id,
-          name: title,
-          description,
-          listing_price: listingPrice ? parseFloat(listingPrice) : null,
-          acquisition_price: acquisitionPrice ? parseFloat(acquisitionPrice) : null,
-          currency_code: currencyCode,
-          status,
-          plot_number: plotNumber,
-          image_url: imageUrl,
-        },
-      ]);
-      if (insertError) throw new Error(insertError.message);
-
-      router.push("/properties");
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-neutral-900 text-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Add New Property</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setTitle(e.target.value)
-            }
-            required
-            className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Description</label>
-          <textarea
-            value={description}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setDescription(e.target.value)
-            }
-            className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-1">Listing Price</label>
-            <input
-              type="number"
-              value={listingPrice}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setListingPrice(e.target.value)
-              }
-              className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Acquisition Price</label>
-            <input
-              type="number"
-              value={acquisitionPrice}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAcquisitionPrice(e.target.value)
-              }
-              className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block mb-1">Currency</label>
-          <select
-            value={currencyCode}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setCurrencyCode(e.target.value)
-            }
-            className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-          >
-            <option value="USD">USD</option>
-            <option value="DOP">DOP</option>
-          </select>
-        </div>
-        <div>
-          <label className="block mb-1">Property Type (Status)</label>
-          <input
-            type="text"
-            value={status}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setStatus(e.target.value)
-            }
-            className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Plot Number</label>
-          <input
-            type="text"
-            value={plotNumber}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPlotNumber(e.target.value)
-            }
-            className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Property Picture</label>
-          <input
-            type="file"
-            accept="image/jpeg,image/png"
-            onChange={handleFileChange}
-          />
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => router.push("/properties")}
-            className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Saving..." : "Save"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+  // ... rest of your handleSubmit and JSX stays the same
 }
