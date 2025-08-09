@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/server";
  * Auth callback route — handles setting the Supabase auth session cookies.
  */
 export async function GET(request: Request) {
-  const supabase = await createClient();
-
+  const supabase = await createClient
   // Retrieve the current session from Supabase
   const {
     data: { session },

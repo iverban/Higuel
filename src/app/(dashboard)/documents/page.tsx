@@ -9,7 +9,7 @@ interface PropertyDocument {
 }
 
 export default async function DocumentsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("v_property_documents")
     .select("property_id, file_path, status");
