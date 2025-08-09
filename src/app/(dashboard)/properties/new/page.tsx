@@ -35,7 +35,7 @@ export default function NewPropertyPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -99,7 +99,9 @@ export default function NewPropertyPage() {
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setTitle(e.target.value)
+            }
             required
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           />
@@ -108,7 +110,9 @@ export default function NewPropertyPage() {
           <label className="block mb-1">Description</label>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setDescription(e.target.value)
+            }
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           />
         </div>
@@ -118,7 +122,9 @@ export default function NewPropertyPage() {
             <input
               type="number"
               value={listingPrice}
-              onChange={(e) => setListingPrice(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setListingPrice(e.target.value)
+              }
               className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
             />
           </div>
@@ -127,7 +133,9 @@ export default function NewPropertyPage() {
             <input
               type="number"
               value={acquisitionPrice}
-              onChange={(e) => setAcquisitionPrice(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setAcquisitionPrice(e.target.value)
+              }
               className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
             />
           </div>
@@ -136,12 +144,13 @@ export default function NewPropertyPage() {
           <label className="block mb-1">Currency</label>
           <select
             value={currencyCode}
-            onChange={(e) => setCurrencyCode(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setCurrencyCode(e.target.value)
+            }
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           >
             <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
+            <option value="DOP">DOP</option>
           </select>
         </div>
         <div>
@@ -149,7 +158,9 @@ export default function NewPropertyPage() {
           <input
             type="text"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setStatus(e.target.value)
+            }
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           />
         </div>
@@ -158,13 +169,19 @@ export default function NewPropertyPage() {
           <input
             type="text"
             value={plotNumber}
-            onChange={(e) => setPlotNumber(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPlotNumber(e.target.value)
+            }
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           />
         </div>
         <div>
           <label className="block mb-1">Property Picture</label>
-          <input type="file" accept="image/jpeg,image/png" onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="image/jpeg,image/png"
+            onChange={handleFileChange}
+          />
         </div>
         {error && <p className="text-red-500">{error}</p>}
         <div className="flex justify-end space-x-4">
