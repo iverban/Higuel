@@ -33,10 +33,19 @@ export default function NewPropertyPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Debug auth state on load
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) router.push("/login");
+      const sessionRes = await supabase.auth.getSession();
+      console.log("DEBUG SESSION:", sessionRes);
+
+      const userRes = await supabase.auth.getUser();
+      console.log("DEBUG USER:", userRes);
+
+      if (!userRes.data.user) {
+        console.warn("⚠️ No user found — will redirect to /login");
+        router.push("/login");
+      }
     })();
   }, [router, supabase]);
 
@@ -92,7 +101,7 @@ export default function NewPropertyPage() {
           listing_price: listingPrice ? parseFloat(listingPrice) : null,
           acquisition_price: acquisitionPrice ? parseFloat(acquisitionPrice) : null,
           currency_code: currencyCode || null,
-          property_type: propertyType || null, // optional
+          property_type: propertyType || null,
           plot_number: plotNumber || null,
           image_url: imageUrl,
         },
