@@ -88,12 +88,12 @@ export default function NewPropertyPage() {
         {
           owner_user_id: user.id,
           title,
-          description,
+          description: description || null,
           listing_price: listingPrice ? parseFloat(listingPrice) : null,
           acquisition_price: acquisitionPrice ? parseFloat(acquisitionPrice) : null,
-          currency_code: currencyCode,
-          property_type: propertyType,
-          plot_number: plotNumber,
+          currency_code: currencyCode || null,
+          property_type: propertyType || null, // optional
+          plot_number: plotNumber || null,
           image_url: imageUrl,
         },
       ]);
@@ -101,10 +101,15 @@ export default function NewPropertyPage() {
 
       router.push("/properties");
     } catch (err) {
+      console.error("Supabase insert error:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unexpected error occurred.");
+        try {
+          setError(JSON.stringify(err));
+        } catch {
+          setError("An unexpected error occurred.");
+        }
       }
     } finally {
       setLoading(false);
@@ -164,6 +169,7 @@ export default function NewPropertyPage() {
             onChange={(e) => setCurrencyCode(e.target.value)}
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
           >
+            <option value="">No currency</option>
             <option value="USD">USD</option>
             <option value="DOP">DOP</option>
           </select>
@@ -175,9 +181,8 @@ export default function NewPropertyPage() {
             value={propertyType}
             onChange={(e) => setPropertyType(e.target.value)}
             className="w-full p-2 rounded bg-neutral-800 border border-neutral-700"
-            required
           >
-            <option value="">Select type</option>
+            <option value="">No type</option>
             {PROPERTY_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
