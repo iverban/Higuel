@@ -92,7 +92,7 @@ export default function NewPropertyPage() {
           listing_price: listingPrice ? parseFloat(listingPrice) : null,
           acquisition_price: acquisitionPrice ? parseFloat(acquisitionPrice) : null,
           currency_code: currencyCode,
-          property_type: propertyType, // PRD enum column
+          property_type: propertyType,
           plot_number: plotNumber,
           image_url: imageUrl,
         },
@@ -100,8 +100,12 @@ export default function NewPropertyPage() {
       if (insertError) throw insertError;
 
       router.push("/properties");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -111,6 +115,7 @@ export default function NewPropertyPage() {
     <div className="max-w-2xl mx-auto p-6 bg-neutral-900 text-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4">Add New Property</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        
         <div>
           <label className="block mb-1">Title</label>
           <input
@@ -218,6 +223,7 @@ export default function NewPropertyPage() {
             {loading ? "Saving..." : "Save"}
           </button>
         </div>
+
       </form>
     </div>
   );
