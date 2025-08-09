@@ -13,8 +13,23 @@ export async function createClient(): Promise<SupabaseClient> {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set() { /* no-op */ },
-        remove() { /* no-op */ },
+        set(name: string, value: string, options: Record<string, unknown>) {
+          // Force cookie domain for production
+          const newOptions = {
+            ...options,
+            domain: ".higuel.vercel.app", // ✅ matches your Vercel domain
+          };
+          // You could also add Secure/SameSite here if needed
+          cookieStore.set({ name, value, ...newOptions });
+        },
+        remove(name: string, options: Record<string, unknown>) {
+          // Force same domain when removing
+          const newOptions = {
+            ...options,
+            domain: ".higuel.vercel.app",
+          };
+          cookieStore.set({ name, value: "", ...newOptions });
+        },
       },
     }
   );
