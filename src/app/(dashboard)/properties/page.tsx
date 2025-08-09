@@ -11,10 +11,16 @@ interface Property {
 }
 
 export default async function PropertiesPage() {
-  const supabase = createClient();
+  const supabase = await createClient(); // ✅ added await
+
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
+
+  if (userError) {
+    return <p className="text-red-500">Error fetching user: {userError.message}</p>;
+  }
 
   if (!user) {
     return <p className="text-red-500">You must be logged in to see properties.</p>;
